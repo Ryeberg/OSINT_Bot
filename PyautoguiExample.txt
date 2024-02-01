@@ -1,0 +1,76 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import pyautogui
+import time
+
+# username = "Jason"
+# password = "BornToBewild2"
+
+# url = "https://www.stealmylogin.com/demo"
+
+# driver = webdriver.Firefox()
+
+# driver.get(url)
+
+# driver.find_element(By.NAME, "username").send_keys(username)
+# driver.find_element(By.NAME, "password").send_keys(password)
+# driver.find_element(By.CSS_SELECTOR, "input[type=\"submit\" i]").click()
+
+# print("logged in successfully")
+
+# time.sleep(3)  # Puts the program to sleep after 3 seconds at this point of the code
+
+# print(pyautogui.size())  # Prints the resolution of your screen
+# print(pyautogui.position())  # Prints current position of mouse
+
+# pyautogui.moveTo(100, 100, 3)  # Allows you to move your mouse to the specified coordinates. 3 Seconds
+# pyautogui.moveRel(100, 100, 3)  # Allows you to move your mouse relative to its position
+# pyautogui.click(500, 500, 2, 3, button="left")  # Allows you to click on the specified location
+
+# pyautogui.doubleClick()  # More specific click commands
+# pyautogui.tripleClick()
+# pyautogui.leftClick()
+# pyautogui.rightClick()
+
+# pyautogui.scroll(500)  # Allows you to scroll with your mouse (-500 scrolls down)
+
+# Example of mouse up and down using paint
+# pyautogui.mouseDown(1216, 963, button="left")
+# pyautogui.moveTo(1700, 963, 3)
+# pyautogui.mouseUp()
+# pyautogui.moveTo(1800, 963, 3)
+
+# Auto Spiral
+# time.sleep(1)
+# distance = 300
+# while distance > 0:
+#     pyautogui.dragRel(distance, 0, 0.2, button="left")
+#     distance = distance - 20
+#     pyautogui.dragRel(0, distance, 0.2, button="left")
+#     pyautogui.dragRel(-distance, 0, 0.2, button="left")
+#     distance = distance - 20
+#     pyautogui.dragRel(0, -distance, 0.2, button="left")
+# time.sleep(2)
+
+#Social media example
+# for i in range(10):
+#     pyautogui.moveTo(450, 500)
+#     time.sleep(1)
+#     pyautogui.doubleClick()
+#     time.sleep(1)
+#     pyautogui.moveTo(854, 515)
+#     time.sleep(1)
+#     pyautogui.leftClick()
+
+# keyboard functions
+# pyautogui.write("hello")
+# pyautogui.press("enter")
+# pyautogui.press("space")
+
+
+# Screenshot in pyautogui
+# pyautogui.screenshot("Screenshot.jpg")
+
+# --------------------------------------------------------------------------------------------------------------------
+
+# Project Code

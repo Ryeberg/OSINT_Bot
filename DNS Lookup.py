@@ -4,12 +4,12 @@ import requests
 #--GLOBAL VARIABLES--
     #the link: had to put this here, not a fan
 def domainNameLink():
-domainName = input('Enter Domain Name: ')
-
-siteName   = 'https://check-host.net/ip-info?host='
-siteToken  = '&csrf_token=4d2ba08a6cadb5a4bcc845de3d4b9a4ddbeba508'
-
-return siteName+domainName+siteToken
+    domainName = input('Enter Domain Name: ')
+    
+    siteName   = 'https://check-host.net/ip-info?host='
+    siteToken  = '&csrf_token=4d2ba08a6cadb5a4bcc845de3d4b9a4ddbeba508'
+    
+    return siteName+domainName+siteToken
 
 
     #get html

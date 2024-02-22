@@ -1,38 +1,43 @@
 Window container dimensions: 840 x 740, Background color is dark gray
-Frame Header: Background color orange, Font is Arial, Font color is Black, Font is Bold, Font is Centered
-Frame Header text will display: "HarvestR OSINT Image Recognition Tool (versions 1.00)" Text size: 14
+Header Label: Forground color orange, Font is Arial, Font color is Black, Font is Bold, Font is Centered, fill is full
+Header Label text will display: "HarvestR OSINT Image Recognition Tool (versions 1.01)" Text size: 14
 
-Label 1 underneath frame will have a padding of 100 from the top, 590 from the right
-Label 1 text will display: "File Creation / Evidence Location" in white bold Arial font, Text size: 14
+Label 1 underneath Header Label will have a cordinates of 30 x 90
+Label 1 text will display: "File Creation / Evidence Location", Font is white, Font is bold, Font is Arial font, Text size: 14
 
-Container 1 underneath label 1 dimensions: 780 x 100, Background color light gray, centered within Window Container
-Container 1 underneath label 1 will have two labels within container one saying Folder Name and File Name, both in black bold Arial font, Text size: 14
-Sub labels padding: 80 to the left for "Folder Name" and 100 to the left for "File Name"
+Container 1 Frame underneath label 1 dimensions: 780 x 120, foreground color light gray, centered within Window Container
+Container 1 Frame underneath label 1 will have two sub labels within container one saying "Folder Name" and "File Name", both Fonts black, Fonts bold, Fonts is Arial, Text size: 14
+Sub Label padding 1: 80 x 20 "Folder Name" 
+Sub Label padding 2: 99 x 60 "File Name"
 
-Text field 1 will be to the right of Label Folder Name with dimensions 435 x 25. Font color Gray default message inside of text field will display
-"Default Evidence", Text size: 12. 
-Text field 2 will be to the right of Label File Name with dimensions 435 x 25. Grayed default message inside of text field will display
+Text field 1 will be to the right of Label Folder Name with dimensions width 450. Font placeholder color Gray, message inside of text field will display
+"Default Evidence", Text size: 12.
+Text field 2 will be to the right of Label File Name with dimensions width 450. Font placeholder color Gray, message inside of text field will display
 "Default Image Forensic Report, Text size: 12"
 
-Button 1: Dimensions are 110 x 25, to the right of Text field 1, Text inside of button will display "browse" font color black bold, Text size: 12
-Button 2: Dimensions are 110 x 25, to the right of Text field 2, Text inside of button will display "browse" font color black bold, Text size: 12
+Button 1: Dimensions width 110 with cordinates 650 x 20, to the right of Text field 1, Text inside of button will display "browse" Font color black,Font is bold, Text size: 12
+Button 2: Dimensions width 110 with cordinates 650 x 20, to the right of Text field 2, Text inside of button will display "browse" Font color black, Font is bold, Text size: 12
 Funtions of Button 1 and Button 2 will allow the user to open windows explore to browse filepath of selected folder and file names.
 
-Label 2 underneath Container 1 will have a padding of 30 from the top and same padding as Label 1 frome the sides.
-Label 2 text will display: "Upload / Search Image" in font color white bold Arial font, Text size: 14
+Label 2 underneath Container 1 will have cordinates of 30 x 270.
+Label 2 text will display: "Upload / Search Image" in Font color white, Font bold, Font Arial, Text size: 14
 
-Container 2 underneath label 2 dimensions: 780 x 200, Background color light gray, centered within Window Container
-Container 2 underneath label 2 will have 2 labels within the container, one saying "File Path to Image" and "Select OS", both in font color black bold Arial font, Text size: 14
-Sub label padding: 40 to the left for "File Path to Image" and 100 to the left for "Select OS"
+Container 2 Frame underneath label 2 dimensions: 780 x 240, Background color light gray, centered within Window Container
+Container 2 Frame underneath label 2 will have 2 sub labels within the container, one saying "File Path to Image" and "Select OS", both in Font color black, Font bold, Font Arial, Text size: 14
+Sub label 3 padding: 42 x 20 "File Path to Image" 
+Sub label 4 padding: 99 x 70 "Select OS"
 
-Text field 3 will be to the right of File Path to Image with dimensions 435 x 25. Grayed default message inside of text field will display "Exact File Path", Text size: 12.
+Text field 3 will be to the right of File Path to Image with dimensions width 450 with cordinates 190 x 20. Place holder color Gray, message inside of text field will display "Exact File Path", Text size: 12.
 
-Button 3: Dimensions are 110 x 25, to the right of Text field 3, Text inside of button will display "browse" black bold, Text size: 12
+Button 3: Dimensions cordinates are 650 x 20, to the right of Text field 3, Text inside of button will display "browse" Font black, Font color black, Text size: 12
 
-Radio button 1: To the right of Select OS, Text will display to right of Radio button 1 "Windows", black and bold, Text size: 14
-Radio button 2: to the right of Radio button 1 Text, Text will display to the right of Radio button 2 "Mac", font color black and bold, Text size: 14
-A hidden text will be to the right of Radio button 2 to make sure that if the user doesn't select an option when clicking "Run Analysis" the program wont run. The Text next to 
+Radio button 1: Dimensions cordinates 190 x 70, To the right of Select OS, Text will display to right of Radio button 1 "Windows", Font color black, Font bold, Text size: 14
+Radio button 2: Dimensions cordinates 300 x 70, to the right of Radio button 1 Text, Text will display to the right of Radio button 2 "Mac", Font color black, Font bold, Text size: 14
+
+(Optional) A hidden text will be to the right of Radio button 2 to make sure that if the user doesn't select an option when clicking "Run Analysis" the program wont run. The Text next to 
 the "Mac" will pop up and display "Please Select OS" in Dark red and bold, Text size: 14.
 
-Button 4: Padding from top will be 20, Will have rounded edges, dimensions: 240 x 30, Font color black inside, centered
-Button 5: Padding from top will be 10, Will have rounded edges, dimensions: 240 x 30, Font color black inside, centered
+Button 4: Dimensions width 240 height 35, dimensions: 540 x 190, Font color black inside, centered
+Button 5: Dimensions width 240 height 35, dimensions: 20 x 190, Font color black inside, centered
+
+Textbox: Dimensions width 780 height 110, padding 20, border color gray, Font color white, Font Arial, Text size: 12

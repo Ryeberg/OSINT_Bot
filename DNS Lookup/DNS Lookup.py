@@ -21,8 +21,8 @@ def domainNameLink():
         if not urlExtension(domainName):
             print('\nNo infomation found.\nPlease use url extensions (.com, .org, etc).\n')
         
-    siteName   = 'https://check-host.net/ip-info?host='
-    siteToken  = '&csrf_token=4d2ba08a6cadb5a4bcc845de3d4b9a4ddbeba508'
+    siteName   = 'https://check-host.net/ip-info?host='                 #dont touch
+    siteToken  = '&csrf_token=4d2ba08a6cadb5a4bcc845de3d4b9a4ddbeba508' #dont touch
     
     return siteName+domainName+siteToken
 
@@ -63,6 +63,15 @@ def contentToText(tableContent,tableText):
         tableText.insert( i,tableContent[i].text.replace('\n',' ') )
 
 
+    #converts tag elements into strings for each table
+def setTableText():
+    contentToText(dbIP_tableContents,dbIP_tableContents_text)
+    contentToText(ipgeolocation_tableContents,ipgeolocation_tableContents_text)
+    contentToText(ip2location_tableContents,ip2location_tableContents_text)
+    contentToText(geolite2_tableContents,geolite2_tableContents_text)
+    contentToText(ipinfoio_tableContents,ipinfoio_tableContents_text)
+
+
     #print list with table info and none values *flag image*
 def checkNoneType(table):
     tableLength = len(table)    
@@ -72,7 +81,6 @@ def checkNoneType(table):
         else:
             print('FORMATTING ERROR -> ',table[i])
     print('\n')
-
 
 
 #gets the element name only from table
@@ -104,8 +112,7 @@ def getElementName(elementName):
             elementName = dbIP_tableContents[element].text.strip()[:11]     #Postal Code
         
     return elementName
-
-
+    
     #print the format for printElements()
 def printFormat(elementName,tableName,tableContent):
     #centering the format
@@ -178,48 +185,51 @@ def listHeaders():
 
     #cases to select specific elements
 def selectElement():
-    listHeaders()
-    choice = input('Select a table element, 1-11 ("q" to exit)\n')
+    choice = ''
     
-    match choice:
-        case '1':
-            choice = strToInt(choice)   #IP
-            printElements(choice)
-        case '2': 
-            choice = strToInt(choice)   #Host Name
-            printElements(choice)
-        case '3': 
-            choice = strToInt(choice)   #IP Range
-            printElements(choice)
-        case '4': 
-            choice = strToInt(choice)   #ISP
-            printElements(choice)
-        case '5': 
-            choice = strToInt(choice)   #Organization
-            printElements(choice)
-        case '6':
-            choice = strToInt(choice)   #Country
-            printElements(choice)
-        case '7': 
-            choice = strToInt(choice)   #Region
-            printElements(choice)
-        case '8': 
-            choice = strToInt(choice)   #City
-            printElements(choice)
-        case '9': 
-            choice = strToInt(choice)   #Time Zone
-            printElements(choice)
-        case '10': 
-            choice = strToInt(choice)   #Local Time
-            printElements(choice)
-        case '11': 
-            choice = strToInt(choice)   #Postal Code
-            printElements(choice)
-        case 'q':
-            print()                     #Quit
-        case default:
-            print('Enter a number from 1-11\nEnter again\n\n')   #default
-            selectElement()
+    while not choice == 'q':
+        listHeaders()
+        choice = input('Select a table element, 1-11 ("q" to exit)\n')
+        print()
+        
+        match choice:
+            case '1':
+                choice = strToInt(choice)   #IP
+                printElements(choice)
+            case '2': 
+                choice = strToInt(choice)   #Host Name
+                printElements(choice)
+            case '3': 
+                choice = strToInt(choice)   #IP Range
+                printElements(choice)
+            case '4': 
+                choice = strToInt(choice)   #ISP
+                printElements(choice)
+            case '5': 
+                choice = strToInt(choice)   #Organization
+                printElements(choice)
+            case '6':
+                choice = strToInt(choice)   #Country
+                printElements(choice)
+            case '7': 
+                choice = strToInt(choice)   #Region
+                printElements(choice)
+            case '8': 
+                choice = strToInt(choice)   #City
+                printElements(choice)
+            case '9': 
+                choice = strToInt(choice)   #Time Zone
+                printElements(choice)
+            case '10': 
+                choice = strToInt(choice)   #Local Time
+                printElements(choice)
+            case '11': 
+                choice = strToInt(choice)   #Postal Code
+                printElements(choice)
+            case 'q':
+                print()                     #Quit
+            case default:
+                print('\nEnter a number from 1-11\nEnter again\n\n')   #default
 
 
     #print list with table info
@@ -299,18 +309,9 @@ def writeFile():
 
 #--MAIN METHOD--
 def main():
-    #pass the content to the list
-    contentToText(dbIP_tableContents,dbIP_tableContents_text)
-    contentToText(ipgeolocation_tableContents,ipgeolocation_tableContents_text)
-    contentToText(ip2location_tableContents,ip2location_tableContents_text)
-    contentToText(geolite2_tableContents,geolite2_tableContents_text)
-    contentToText(ipinfoio_tableContents,ipinfoio_tableContents_text)
-    
-    #printAllTables()
-    #selectElement()
-    
-    writeFile()
-    selectElement()
+    setTableText()    #pass the content to the text list
+    writeFile()       #write the tables to a .txt file
+    selectElement()   #menu for user to look through table elements of each table
     
 
 #call main method

@@ -1,5 +1,3 @@
-import customtkinter
-import pywinstyles
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -11,17 +9,21 @@ import time
 import pyperclip
 import re
 import os
+import pywinstyles
+import requests
 import customtkinter as ctk
 
 
-# These variables are global
+# Global Variables
 hidden_text_id = None
 default_folder = "Evidence"
 default_file = "Image Forensic Report"
 folder_path = None
 file_path = None
+domain_name = None
 
 
+# Future project but for now this portion does not work and may need further testing
 def toggle_hidden_text():
     global hidden_text_id
 
@@ -36,14 +38,15 @@ def toggle_hidden_text():
         return
 
 
+# Function for browsing file path
 def browse(text_field):
-    # Function for browsing file path
 
     selected_path = filedialog.askdirectory() if text_field == text_field1 else filedialog.askopenfilename()
     text_field.delete(0, "end")
     text_field.insert(0, selected_path)
 
 
+# Used to chronologically results from image search in Tinyeye.
 def extract_date(capture):
     date_str = capture.find('span', class_="crawl-date").text
     # re.search()searches for the first occurrence of a pattern within a string.
@@ -59,6 +62,7 @@ def extract_date(capture):
         return datetime.min
 
 
+# The second step process for the bot automation specifically used for Tinyeye
 def tiny_collect():
     time.sleep(3)
     # Allows pyautogui to simulate combination keys such as holding down the ctrl button
@@ -106,6 +110,7 @@ Date: {date}
     return message
 
 
+# Used to create folders for the evidence results, if folder input and path is blank then the method will create one.
 def file_action():
     global folder_path, file_path
 
@@ -131,6 +136,7 @@ def file_action():
         return
 
 
+# Main bot process for automation
 def run_analysis(folder_path=None, file_path=None):
     global default_folder, default_file
     toggle_hidden_text()
@@ -208,10 +214,12 @@ def run_analysis(folder_path=None, file_path=None):
         output_text.insert("end", "Please select either Windows or Mac to run Analysis.\n")
 
 
+# Closes the program
 def cancel():
     window.destroy()
 
 
+# Main GUI for HarvestR using customtkinter and tkinter
 window = ctk.CTk()
 
 window.title("HarvestR")
@@ -249,15 +257,11 @@ my_tab.add(tab_1, text="Image-Recon")
 my_tab.add(tab_2, text="DNS")
 my_tab.add(tab_3, text="Social Scrapper")
 
-# Define image
-bg = PhotoImage(file="DNSBackgroundLarge.png")
-
 # Label 1
 label1 = ctk.CTkLabel(tab_1,
                       text='File Creation / Evidence Location',
                       font=("Arial", 14, "bold"),
-                      text_color='white',
-                      )
+                      text_color='white')
 label1.place(x=30, y=20)
 
 # Container 1
@@ -265,8 +269,7 @@ container1 = ctk.CTkFrame(master=tab_1,
                           width=780,
                           height=120,
                           fg_color="light gray",
-                          corner_radius=20  # Adjust the corner radius as needed
-                          )
+                          corner_radius=20)
 container1.pack(pady=(60, 0))
 
 # Create labels within Container 1
@@ -327,8 +330,7 @@ button2.place(x=650, y=60)
 label3 = ctk.CTkLabel(tab_1,
                       text='Upload / Search Image',
                       font=("Arial", 14, "bold"),
-                      text_color='white',
-                      )
+                      text_color='white')
 label3.place(x=30, y=200)
 
 # Container 2
@@ -336,8 +338,7 @@ container2 = ctk.CTkFrame(master=tab_1,
                           width=780,
                           height=240,
                           fg_color="light gray",
-                          corner_radius=20  # Adjust the corner radius as needed
-                          )
+                          corner_radius=20)
 container2.pack(pady=(60, 0))
 
 # Create label within Container 2
@@ -419,8 +420,7 @@ button5 = ctk.CTkButton(master=container2,
                         hover_color="orange",
                         width=240,
                         height=35,
-                        command=cancel
-                        )
+                        command=cancel)
 button5.place(x=20, y=190)
 
 output_text = ctk.CTkTextbox(master=tab_1,
@@ -432,7 +432,325 @@ output_text = ctk.CTkTextbox(master=tab_1,
                              wrap="word")
 output_text.pack(pady=20)
 
-# --------------------------------------------------------------- End of First Tab
+
+# ----------------------------------------------------------------------------------------------------- End of First Tab
+# -------------------------------------------------------------------------------------- Beginning of DNS: Credit Andrew
+
+# Converts the tag elements into strings
+def contentToText(tableContent, tableText):
+    tableLength = len(tableContent)
+    for i in range(tableLength):
+        tableText.insert(i, tableContent[i].text.replace('\n', ' '))
+
+
+# Converts tag elements into strings for each table
+def setTableText():
+    contentToText(dbIP_tableContents, dbIP_tableContents_text)
+    contentToText(ipgeolocation_tableContents, ipgeolocation_tableContents_text)
+    contentToText(ip2location_tableContents, ip2location_tableContents_text)
+    contentToText(geolite2_tableContents, geolite2_tableContents_text)
+    contentToText(ipinfoio_tableContents, ipinfoio_tableContents_text)
+
+
+# Gets the element name only from table
+def getElementName(elementName):
+    element = int(elementName)
+
+    match element:
+        case 0:
+            elementName = dbIP_tableContents[element].text.strip()[:10]  # IP
+        case 1:
+            elementName = dbIP_tableContents[element].text.strip()[:9]  # Host Name
+        case 2:
+            elementName = dbIP_tableContents[element].text.strip()[:8]  # IP Range
+        case 3:
+            elementName = dbIP_tableContents[element].text.strip()[:3]  # ISP
+        case 4:
+            elementName = dbIP_tableContents[element].text.strip()[:12]  # Organization
+        case 5:
+            elementName = dbIP_tableContents[element].text.strip()[:7]  # Country
+        case 6:
+            elementName = dbIP_tableContents[element].text.strip()[:6]  # Region
+        case 7:
+            elementName = dbIP_tableContents[element].text.strip()[:4]  # City
+        case 8:
+            elementName = dbIP_tableContents[element].text.strip()[:9]  # Time Zone
+        case 9:
+            elementName = dbIP_tableContents[element].text.strip()[:10]  # Local Time
+        case 10:
+            elementName = dbIP_tableContents[element].text.strip()[:11]  # Postal Code
+
+    return elementName
+
+
+def contentFormat(table, element, elementLength):
+    updatedContent = ''
+    contentLength = len(table[element].text.strip())
+
+    if contentLength + 1 == elementLength:
+        return updatedContent
+    else:
+        match element:
+            case 2:  # "3" IP Range
+                updatedContent = table[element].text.strip()[elementLength + 1:-6] + ' ' + table[element].text.strip()[
+                                                                                           contentLength - 4:]
+            case 5:  # "6" Country
+                updatedContent = table[element].text.strip()[elementLength + 2:-5] + ' ' + table[element].text.strip()[
+                                                                                           contentLength - 4:]
+            case 8:  # "9" Time Zone
+                updatedContent = table[element].text.strip()[elementLength + 1:]
+            case default:
+                updatedContent = table[element].text.strip()[elementLength:]
+
+    return updatedContent
+
+
+# Print the format for printElements()
+def printFormat(elementName, tableName, tableContent):
+    # centering the format
+    longestTableName = 29
+    dashes = (longestTableName - len(tableName)) + 10
+
+    # Main output print
+    visual_box2.insert("end", f'%s\n%s{" %s" :->{dashes}}\n\n' % (elementName, tableName, tableContent))
+
+
+# Format the content for printElements()
+def contentFormat(table, element, elementLength):
+    updatedContent = ''
+    contentLength = len(table[element].text.strip())
+
+    if contentLength + 1 == elementLength:
+        return updatedContent
+    else:
+        match element:
+            case 2:  # "3" IP Range
+                updatedContent = table[element].text.strip()[elementLength + 1:-6] + ' ' + table[element].text.strip()[
+                                                                                           contentLength - 4:]
+            case 5:  # "6" Country
+                updatedContent = table[element].text.strip()[elementLength + 2:-5] + ' ' + table[element].text.strip()[
+                                                                                           contentLength - 4:]
+            case 8:  # "9" Time Zone
+                updatedContent = table[element].text.strip()[elementLength + 1:]
+            case default:
+                updatedContent = table[element].text.strip()[elementLength:]
+
+    return updatedContent
+
+
+# num arg, prints specific element from each table
+def printElements(element):
+    # Organize the table's name *readable*
+    dbIP = dbIP_table.a.text.strip()[:5] + ' ' + dbIP_table.a.text.strip()[6:]
+    ipgeolocation = ipgeolocation_table.a.text.strip()[:16] + ' ' + ipgeolocation_table.a.text.strip()[17:]
+    ip2location = ip2location_table.a.text.strip()[:11] + ' ' + ip2location_table.a.text.strip()[12:]
+    geolite2 = geolite2_table.a.text.strip()[:13] + ' ' + geolite2_table.a.text.strip()[14:]
+    ipinfoio = ipinfoio_table.a.text.strip()[:9] + ' ' + ipinfoio_table.a.text.strip()[10:]
+
+    # elementName's length for getting the content
+    elementLength = len(getElementName(element)) + 1
+
+    # Element content
+    dbIP_Content = contentFormat(dbIP_tableContents, element, elementLength)
+    ipgeolocation_Content = contentFormat(ipgeolocation_tableContents, element, elementLength)
+    ip2location_Content = contentFormat(ip2location_tableContents, element, elementLength)
+    geolite2_Content = contentFormat(geolite2_tableContents, element, elementLength)
+    ipinfoio_Content = contentFormat(ipinfoio_tableContents, element, elementLength)
+
+    # Print table name and elements related
+    printFormat(getElementName(element), dbIP, dbIP_Content)
+    printFormat(getElementName(element), ipgeolocation, ipgeolocation_Content)
+    printFormat(getElementName(element), ip2location, ip2location_Content)
+    printFormat(getElementName(element), geolite2, geolite2_Content)
+    printFormat(getElementName(element), ipinfoio, ipinfoio_Content)
+
+
+# Loop through table list, return string
+def listToString(table):
+    stringTable = ''
+    tableLength = len(table)
+
+    for i in range(tableLength):
+        elementName = getElementName(i)
+        elementContent = table[i][len(getElementName(i)) + 2:]
+
+        longestElementName = 12
+        dashes = (longestElementName - len(elementName)) + 10
+
+        stringTable += f'  %s {" %s":->{dashes}}' % (elementName, elementContent) + '\n'
+
+    stringTable += '\n\n'
+
+    return stringTable
+
+
+# Pass the text list to a single String
+def passList():
+    fullTable = ''
+
+    fullTable += dbIP_table.div.text.strip() + '\n'
+    fullTable += listToString(dbIP_tableContents_text)
+
+    fullTable += ipgeolocation_table.div.text.strip() + '\n'
+    fullTable += listToString(ipgeolocation_tableContents_text)
+
+    fullTable += ip2location_table.div.text.strip() + '\n'
+    fullTable += listToString(ip2location_tableContents_text)
+
+    fullTable += geolite2_table.div.text.strip() + '\n'
+    fullTable += listToString(geolite2_tableContents_text)
+
+    fullTable += ipinfoio_table.div.text.strip() + '\n'
+    fullTable += listToString(ipinfoio_tableContents_text)
+
+    return fullTable
+
+
+# Print the elements header ie IP, Host Name, etc
+def listHeaders():
+    headerTags = []
+    for i in range(len(dbIP_tableContents)):
+        headerTags.insert(i, dbIP_tableContents[i].td)
+        visual_box2.insert("end", f'%2d. {headerTags[i].text}' % (i+1))
+
+
+# Cases to select specific elements
+def selectElement(value):
+    visual_box2.delete(1.0, "end")
+
+    # listHeaders()  # For display purposes
+    choice = value
+
+    match choice:
+        case 'IP':
+            choice = 1  # IP
+            printElements(choice)
+        case '2':
+            choice = 2  # Host Name
+            printElements(choice)
+        case '3':
+            choice = 3  # IP Range
+            printElements(choice)
+        case '4':
+            choice = 4  # ISP
+            printElements(choice)
+        case '5':
+            choice = 5  # Organization
+            printElements(choice)
+        case '6':
+            choice = 6  # Country
+            printElements(choice)
+        case '7':
+            choice = 7  # Region
+            printElements(choice)
+        case '8':
+            choice = 8  # City
+            printElements(choice)
+        case '9':
+            choice = 9  # Time Zone
+            printElements(choice)
+        case '10':
+            choice = 10  # Local Time
+            printElements(choice)
+        case '11':
+            choice = 11  # Postal Code
+            printElements(choice)
+
+    choice = my_combo.get()
+
+    # Define mapping of choices to their corresponding indexes
+    choice_mapping = {
+        "IP": 1,
+        "Host Name": 2,
+        "ISP": 4,
+        "Organization": 5,
+        "Country": 6,
+        "Region": 7,
+        "City": 8,
+        "Time Zone": 9,
+        "Local Time": 10,
+        "Postal code": 11
+    }
+
+    # Get the index corresponding to the selected choice
+    choice_index = choice_mapping.get(choice)
+
+    if choice_index is not None:
+        # listHeaders()
+        printElements(choice_index)
+    else:
+        visual_box2.insert("end", 'Could not display anything.')  # Default case
+
+
+# Create text file and pass table info
+def writeFile():
+    tables = open("newFile.txt", 'w')
+    tables.write(passList())
+    tables.close()
+
+
+# The link: had to put this here, not a fan
+def domainNameLink():
+
+    visual_box1.delete(1.0, "end")
+
+    global dbIP_tableContents, ipgeolocation_tableContents, ip2location_tableContents, geolite2_tableContents
+    global ipinfoio_tableContents
+    global dbIP_tableContents_text, ipgeolocation_tableContents_text, ip2location_tableContents_text
+    global geolite2_tableContents_text, ipinfoio_tableContents_text
+    global dbIP_table, ipgeolocation_table, ip2location_table, geolite2_table, ipinfoio_table
+
+    domainName = text_field4.get()
+
+    pattern = r'\.(com|org|net|edu|gov|mil|int)$'
+    match = re.search(pattern, domainName, re.IGNORECASE)
+
+    if not match:
+        visual_box1.insert("end", '\nNo information found. Please use URL extensions (.com, .org, etc).\n')
+        visual_box2.insert("end", '\nNo information found. Please use URL extensions (.com, .org, etc).\n')
+        return None
+
+    siteName = 'https://check-host.net/ip-info?host='
+    siteToken = '&csrf_token=4d2ba08a6cadb5a4bcc845de3d4b9a4ddbeba508'
+
+    # option = my_combo.get()
+
+    url = siteName + domainName + siteToken
+
+    visual_box1.insert("end", domainName)
+    visual_box1.insert("end", "\n\n")
+
+    siteHtml = requests.get(url).text
+    soup = BeautifulSoup(siteHtml, 'lxml')
+
+    tables = soup.find('div', id='content2')
+
+    dbIP_table = tables.find('div', id='ip_info-dbip')
+    ipgeolocation_table = tables.find('div', id='ip_info-ipgeolocation')
+    ip2location_table = tables.find('div', id='ip_info-ip2location')
+    geolite2_table = tables.find('div', id='ip_info-geolite2')
+    ipinfoio_table = tables.find('div', id='ip_info-ipinfoio')
+
+    dbIP_tableContents = dbIP_table.find_all('tr')
+    ipgeolocation_tableContents = ipgeolocation_table.find_all('tr')
+    ip2location_tableContents = ip2location_table.find_all('tr')
+    geolite2_tableContents = geolite2_table.find_all('tr')
+    ipinfoio_tableContents = ipinfoio_table.find_all('tr')
+
+    # Global list to collect the tables data for improving readability
+    dbIP_tableContents_text = []
+    ipgeolocation_tableContents_text = []
+    ip2location_tableContents_text = []
+    geolite2_tableContents_text = []
+    ipinfoio_tableContents_text = []
+
+    setTableText()
+
+    visual_box1.insert("end", passList())  # Display the search
+
+
+# Define image
+bg = PhotoImage(file="DNSBackgroundLarge.png")
 
 # Transparent color
 window.wm_attributes('-transparentcolor', '#382276')
@@ -441,8 +759,8 @@ canvas = Canvas(tab_2, width=840, height=740, background='black', highlightthick
 
 canvas.create_image(5, 0, image=bg, anchor=NW)
 canvas.create_text(105, 50, text='DNS Lookup', fill="white", font=('Arial', 12, 'bold'))
-canvas.create_text(260, 350, text='View: ', fill="white", font=('Arial', 12, 'bold'))
-canvas.create_text(760, 350, text='View: ', fill="white", font=('Arial', 12, 'bold'))
+canvas.create_text(105, 350, text='Table View ', fill="white", font=('Arial', 12, 'bold'))
+canvas.create_text(720, 350, text='Element View: ', fill="white", font=('Arial', 12, 'bold'))
 canvas.pack(fill="both", expand=True)
 
 # Tab Container 2
@@ -451,108 +769,96 @@ tab_2_container = ctk.CTkFrame(master=tab_2,
                                height=180,
                                fg_color="#2D3C4C",
                                bg_color="#000001",
-                               corner_radius=20  # Adjust the corner radius as needed
-                               )
+                               corner_radius=20)
 tab_2_container.place(relx=0.04, rely=0.1, anchor="nw")
 
 # Used for transparency
-pywinstyles.set_opacity(tab_2_container, color="#000001")
+# pywinstyles.set_opacity(tab_2_container, color="#000001")
 
 # Label for Domain
 tab2_label = ctk.CTkLabel(tab_2_container,
                           text='Domain: ',
                           font=("Arial", 14, "bold"),
                           text_color='white',
-                          bg_color="#2D3C4C"
-                          )
-tab2_label.place(relx=0.1, rely=0.2, anchor="nw")
+                          bg_color="#2D3C4C")
+tab2_label.place(relx=0.1, rely=0.3, anchor="nw")
 
 # Text field 4 (Enter Domain Name)
 text_field4 = ctk.CTkEntry(master=tab_2_container,
-                           width=400,
+                           width=450,
                            font=("Arial", 12),
                            fg_color="white",
                            text_color='black',
                            placeholder_text="Enter Domain Name")
-text_field4.place(relx=0.2, rely=0.2, anchor="nw")
+text_field4.place(relx=0.2, rely=0.3, anchor="nw")
 
-# Label for Domain
-tab2_label2 = ctk.CTkLabel(tab_2_container,
-                           text='Element: ',
-                           font=("Arial", 14, "bold"),
-                           text_color='white',
-                           bg_color="#2D3C4C"
-                           )
-tab2_label2.place(relx=0.092, rely=0.5, anchor="nw")
+# Button 5: Run DNS Search
+button5 = ctk.CTkButton(master=tab_2_container,
+                        text="Search",
+                        font=("Arial", 12, "bold"),
+                        fg_color="white",
+                        bg_color='#2D3C4C',
+                        text_color="black",
+                        hover_color="light blue",
+                        width=110,
+                        command=lambda: domainNameLink())
+button5.place(relx=0.42, rely=0.55, anchor="nw")
 
+# Button 6: Run DNS Search
+button6 = ctk.CTkButton(master=tab_2_container,
+                        text="Save",
+                        font=("Arial", 12, "bold"),
+                        fg_color="white",
+                        bg_color='#2D3C4C',
+                        text_color="black",
+                        hover_color="light blue",
+                        width=110,
+                        command=lambda: writeFile())
+button6.place(relx=0.42, rely=0.75, anchor="nw")
 
-def element_picker(choice):
-    print()
+view = ["IP",
+        "Host Name",
+        "ISP",
+        "Organization",
+        "Country",
+        "Region",
+        "City",
+        "Time Zone",
+        "Local Time",
+        "Postal code"]
 
-
-elements = ["Select Element", "Tables"]
-# Dropdown for elements
-my_combo = customtkinter.CTkComboBox(tab_2_container,
-                                     values=elements,
-                                     width=170,
-                                     dropdown_fg_color="white",
-                                     dropdown_text_color="black",
-                                     dropdown_hover_color="light gray",
-                                     fg_color="white",
-                                     text_color="black",
-                                     command=element_picker
-                                     )
-my_combo.place(relx=0.2, rely=0.5, anchor="nw")
-my_combo.set('Select Element')
-
-view = ["IP", "Host Name", "ISP", "Organization", "Country", "Region", "City", "Time Zone", "Local Time", "Postal code"]
-
-# Dropdown for view 1
-my_combo2 = customtkinter.CTkComboBox(tab_2,
-                                      values=view,
-                                      width=170,
-                                      dropdown_fg_color="white",
-                                      dropdown_text_color="black",
-                                      dropdown_hover_color="light gray",
-                                      fg_color="white",
-                                      text_color="black",
-                                      command=element_picker
-                                      )
-my_combo2.place(relx=0.28, rely=0.39, anchor="nw")
-my_combo2.set('Select view type')
 
 # Dropdown for view 2
-my_combo3 = customtkinter.CTkComboBox(tab_2,
-                                      values=view,
-                                      width=170,
-                                      dropdown_fg_color="white",
-                                      dropdown_text_color="black",
-                                      dropdown_hover_color="light gray",
-                                      fg_color="white",
-                                      text_color="black",
-                                      command=element_picker
-                                      )
-my_combo3.place(relx=0.76, rely=0.39, anchor="nw")
-my_combo3.set('Select view type')
+my_combo = ctk.CTkComboBox(tab_2,
+                           values=view,
+                           width=170,
+                           dropdown_fg_color="white",
+                           dropdown_text_color="black",
+                           dropdown_hover_color="light gray",
+                           fg_color="white",
+                           text_color="black",
+                           command=selectElement)
+my_combo.place(relx=0.76, rely=0.39, anchor="nw")
+my_combo.set('Select view type')
 
 # Visual display 1
-Visual_box1 = ctk.CTkTextbox(master=tab_2,
+visual_box1 = ctk.CTkTextbox(master=tab_2,
                              width=370,
                              height=360,
                              font=("Arial", 12),
                              text_color="black",
                              fg_color="white",
                              wrap="word")
-Visual_box1.place(relx=0.04, rely=0.45, anchor="nw")
+visual_box1.place(relx=0.04, rely=0.45, anchor="nw")
 
 # Visual display 2
-Visual_box2 = ctk.CTkTextbox(master=tab_2,
+visual_box2 = ctk.CTkTextbox(master=tab_2,
                              width=370,
                              height=360,
                              font=("Arial", 12),
                              text_color="black",
                              fg_color="white",
                              wrap="word")
-Visual_box2.place(relx=0.52, rely=0.45, anchor="nw")
+visual_box2.place(relx=0.52, rely=0.45, anchor="nw")
 
 window.mainloop()

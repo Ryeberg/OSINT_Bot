@@ -46,3 +46,37 @@ time.sleep(2)
 screeshot = pyautogui.screenshot()
 screeshot.save("otherLocations.png")
 print("screenshot taken")
+
+def generate_key():
+    return Fernet.generate_key()  # Corrected class name
+
+def save_key(key, filename="secret.key"):
+    with open(filename, "wb") as key_file:
+        key_file.write(key)
+
+def load_key(filename="secret.key"):  # Added missing colon
+    return open(filename, "rb").read()
+
+def encrypt_message(message, key):
+    f = Fernet(key)
+    encrypted_message = f.encrypt(message.encode())
+    return encrypted_message
+
+def decrypt_message(encrypted_message, key):
+    f = Fernet(key)
+    decrypted_message = f.decrypt(encrypted_message).decode()
+    return decrypted_message
+
+if __name__ == "__main__":
+    # Proper indentation
+    key = generate_key()
+    save_key(key)
+
+    key = load_key()
+
+    original_message = "Sensitive data here"
+    encrypted_message = encrypt_message(original_message, key)  # Corrected function name
+    print(f"Encrypted: {encrypted_message}")  # Corrected variable reference
+
+    decrypted_message = decrypt_message(encrypted_message, key)  # Corrected function name
+    print(f"Decrypted: {decrypted_message}")

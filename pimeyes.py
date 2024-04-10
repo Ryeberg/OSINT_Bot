@@ -48,13 +48,13 @@ screeshot.save("otherLocations.png")
 print("screenshot taken")
 
 def generate_key():
-    return Fernet.generate_key()  # Corrected class name
+    return Fernet.generate_key()  
 
 def save_key(key, filename="secret.key"):
     with open(filename, "wb") as key_file:
         key_file.write(key)
 
-def load_key(filename="secret.key"):  # Added missing colon
+def load_key(filename="secret.key"):  
     return open(filename, "rb").read()
 
 def encrypt_message(message, key):
@@ -75,8 +75,8 @@ if __name__ == "__main__":
     key = load_key()
 
     original_message = "Sensitive data here"
-    encrypted_message = encrypt_message(original_message, key)  # Corrected function name
+    encrypted_message = encrypt_message(original_message, key) 
     print(f"Encrypted: {encrypted_message}")  # Corrected variable reference
 
-    decrypted_message = decrypt_message(encrypted_message, key)  # Corrected function name
+    decrypted_message = decrypt_message(encrypted_message, key)  
     print(f"Decrypted: {decrypted_message}")

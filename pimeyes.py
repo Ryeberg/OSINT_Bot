@@ -1,6 +1,7 @@
 import pyautogui
 from PIL import Image
 import time
+from cryptography.fernet import fernet
 
 time.sleep(3)
 

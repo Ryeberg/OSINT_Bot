@@ -1,14 +1,26 @@
+import os
 from cryptography.fernet import fernet
+from bcrypt import hashpw, gensalt, checkpw
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from base64 import urlsafe_b64encode, urlsafe_b64decode
 
-def generate_key():
-    return fernet.generate_key()
+def hash_password(password):
+    return hashpw(password.encode(), gensalt())
 
-def save_key(key, filename="secret.key"):
-    with open(filename, "wb") as key_file:
-        key_file.write(key)
+def verify_password(stored_hash, password):
+    return checkpw(password.encode(), stored_hash)
 
-def load_key(filename="secret.key")
-    return open(filename, "rb").read()
+def derive_key(password, salt):
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend()
+    )
+    return urlsafe_b64encode(kdf.derive(password.encode()))
 
 def encrypt_message(message, key):
     f = Fernet(key)
@@ -21,16 +33,21 @@ def decrypt_message(encrypted_message, key):
     return decrypted_message
 
 if __name__ == "__main__":
+    password_hash = hash_password(password)
+   
+    salt = os.urandom(16)
 
-key = generate_key()
-save_key(key)
+    if verify_password(password_hash, password):
+    key = derive_key(password, salt)
 
-key = load_key()
+     original_message = "Sensitive data here"
+     encrypted_message = encrypt_message(original_message, key)
+     print(f"Encrypted: {encrypted_message}")
 
-original_message = "Sensitive data here"
+     decrypted_message = decrypt_message(encrypted_message, key)
+     print(f"Decrypted: {decrypted_message}")
 
-encrypted_message = encrypted_message(original_message, key)
-print(f"Encrypted: {encrypted message}")
+else:
+    print("Invalid password, access denied.")
 
-decrypted_message = decrypted_message(encrypted_message, key)
-print(f"Decrypted: {decrypted_message}")
+

@@ -1,3 +1,4 @@
+   
 import pyautogui
 import webbrowser
 from bs4 import BeautifulSoup
@@ -13,9 +14,27 @@ from selenium.common.exceptions import TimeoutException
 def instagram(name):
     
     
-    url=name
+      
+    
+    url = 'https://www.instagram.com/' 
     driver = webdriver.Chrome()
     driver.get(url)
+
+    time.sleep(6)
+    pyautogui.click(991,539)
+    time.sleep(3)
+    pyautogui.typewrite("kjman11555")
+    pyautogui.press('tab')
+    pyautogui.typewrite("Ilovegod1234")
+    pyautogui.press("enter")
+    time.sleep(4)
+    urls=name 
+    driver.get(urls)
+    
+
+
+   
+
     time.sleep(10)
     try:
         post_element = driver.find_element('css selector', 'li:nth-child(1) span.x1vvkbs')
@@ -39,7 +58,6 @@ def instagram(name):
         print("stories:", story_content, "\n")
     except TimeoutException:
         print("Some information could not be found:", e)
-
 
         
 
@@ -136,5 +154,4 @@ def main():
  
 if __name__ == '__main__':
 
-    main()
-    
+    main()  

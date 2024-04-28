@@ -9,33 +9,19 @@ import time
 import pyperclip
 import re
 import os
+from selenium.common.exceptions import TimeoutException
 import pywinstyles
 import requests
 import customtkinter as ctk
 
+# HarvestR main application design. Credit: Andres Ogando
 
 # Global Variables
-hidden_text_id = None
 default_folder = "Evidence"
 default_file = "Image Forensic Report"
 folder_path = None
 file_path = None
 domain_name = None
-
-
-# Future project but for now this portion does not work and may need further testing
-def toggle_hidden_text():
-    global hidden_text_id
-
-    if selected_os.get() == "":
-        # Hidden text for "Please Select OS"
-        hidden_text = ctk.CTkLabel(master=container2,
-                                   text="Please Select OS",
-                                   font=("Arial", 14, "bold"),
-                                   text_color="dark red")
-        hidden_text_id = hidden_text.place(x=450, y=70)
-    else:
-        return
 
 
 # Function for browsing file path
@@ -46,7 +32,7 @@ def browse(text_field):
     text_field.insert(0, selected_path)
 
 
-# Used to chronologically results from image search in Tinyeye.
+# Used to order results chronologically from image search in Tinyeye.
 def extract_date(capture):
     date_str = capture.find('span', class_="crawl-date").text
     # re.search()searches for the first occurrence of a pattern within a string.
@@ -114,32 +100,26 @@ Date: {date}
 def file_action():
     global folder_path, file_path
 
-    try:
-        folder_path = text_field1.get()
+    folder_path = text_field1.get()
+    file_path = text_field2.get()
 
-        file_path = text_field2.get()
-
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
         file_paths = os.path.join(folder_path, f"{file_path}.txt")
         # Write the message to a .txt file
-        with open(file_paths, "a") as file:
-            file.write("")
-
-        # print(f"\nFolder '{folder_path}' and file '{file_path}.txt' created successfully.")
-        output_text.insert("end", f"\nFolder '{folder_path}' and file '{file_path}.txt' created successfully.")
-        return folder_path, file_path
-
-    except KeyboardInterrupt:
-        print("Exiting upload action...")
-        return
+        # with open(file_paths, "a") as file:
+        #     file.write("")
+        #
+        # # print(f"\nFolder '{folder_path}' and file '{file_path}.txt' created successfully.")
+    output_text.insert("end", f"\nFolder '{folder_path}' and file '{file_path}.txt' created successfully.")
+    return folder_path, file_path
 
 
 # Main bot process for automation
 def run_analysis(folder_path=None, file_path=None):
     global default_folder, default_file
-    toggle_hidden_text()
+    # folder_path, file_path = file_action()
 
     if folder_path is None:
         folder_path = default_folder
@@ -149,15 +129,17 @@ def run_analysis(folder_path=None, file_path=None):
     if file_path is None:
         file_path = default_file
     else:
-        file_path = text_field3.get()
+        file_path = text_field2.get()
 
     # folder_path = text_field1.get()
     # file_path = text_field2.get()
+
     image_path = text_field3.get()
     image_path_replace = image_path.replace("/", "\\")
 
     if not image_path:
         output_text.insert("end", "Please provide a file path.\n")
+        return
 
     try:
         with open(image_path.replace("/", "\\"), "rb") as file:
@@ -184,7 +166,7 @@ def run_analysis(folder_path=None, file_path=None):
         pyautogui.press("enter")
 
         time.sleep(3)
-        upload_button = pyautogui.locateOnScreen("Button1.png", confidence=0.7)
+        upload_button = pyautogui.locateOnScreen("Images/Button1.png", confidence=0.7)
         pyautogui.moveTo(upload_button, duration=0.3)
         pyautogui.leftClick()
         time.sleep(1)
@@ -223,13 +205,103 @@ def cancel():
 window = ctk.CTk()
 
 window.title("HarvestR")
-window.after(201, lambda: window.iconbitmap('Icon40.ico'))
+window.after(201, lambda: window.iconbitmap('Images/Icon40.ico'))
 window.geometry('840x740')
-window.resizable(False, False)
+window.resizable(True, True)
+
+# ----------------------------------------------------------------------------------------------- Password ON / OFF
+
+# # Global variables for tracking login attempts and locking time
+# login_attempts = 0
+# locked_until = 0
+#
+#
+# # Function to unlock HarvestR
+# def unlock_harvest(user_input, password_input):
+#     global login_attempts, locked_until
+#
+#     # Hardcoded correct username and password
+#     correct_username = "admin"
+#     correct_password = "password"
+#
+#     # Get the entered username and password
+#     entered_username = user_input.get()
+#     entered_password = password_input.get()
+#
+#     # Check if the screen is locked
+#     if time.time() < locked_until:
+#         output_unlock.insert("end", "Screen is locked. Please try again later.")
+#         return
+#
+#     # Check if the entered username and password are correct
+#     if entered_username == correct_username and entered_password == correct_password:
+#         output_unlock.insert("end", "\nLogin successful. HarvestR unlocked!")
+#         # Remove the overlay container and its contents
+#         time.sleep(2)
+#         overlay_container.destroy()
+#     else:
+#         output_unlock.insert("end", "Incorrect username or password.\n")
+#         login_attempts += 1
+#         # Lock the screen for 3 minutes after 3 failed login attempts
+#         if login_attempts >= 3:
+#             output_unlock.insert("end", "\nToo many login attempts. Screen locked for 3 minutes.")
+#             locked_until = time.time() + 180  # Lock the screen for 3 minutes
+#             login_attempts = 0  # Reset login attempts counter
+#             return
+#
+#
+# # Create a custom container with an orange background
+# overlay_container = ctk.CTkFrame(master=window, width=840, height=740, fg_color="orange")
+# overlay_container.pack(fill="both", expand=True)
+#
+# # Add a label for "HarvestR" in the center
+# harvestr_label = ctk.CTkLabel(master=overlay_container, text="HarvestR", font=("Arial", 24, "bold"), text_color="black")
+# harvestr_label.place(relx=0.5, rely=0.3, anchor="center")
+#
+# # Add a label over the orange frame
+# user_label = ctk.CTkLabel(master=overlay_container, text="User:", font=("Arial", 14, "bold"), text_color="black")
+# user_label.place(relx=0.3, rely=0.4, anchor="center")
+#
+# # Add an input box for user input
+# user_input = ctk.CTkEntry(master=overlay_container, width=300, font=("Arial", 14))
+# user_input.place(relx=0.34, rely=0.4, anchor="w")
+#
+# # Add a label for "Password:"
+# password_label = ctk.CTkLabel(master=overlay_container, text="Password:", font=("Arial", 14, "bold"), text_color="black")
+# password_label.place(relx=0.278, rely=0.45, anchor="center")
+#
+# # Add an input box for user input
+# password_input = ctk.CTkEntry(master=overlay_container,
+#                               width=300,
+#                               show="*",
+#                               font=("Arial", 14))
+# password_input.place(relx=0.34, rely=0.45, anchor="w")
+#
+# # Add a button for "Enter"
+# enter_button = ctk.CTkButton(master=overlay_container,
+#                              text="Enter",
+#                              font=("Arial", 14, "bold"),
+#                              fg_color="#222222",
+#                              hover_color="darkgray",
+#                              bg_color="orange",
+#                              width=10,
+#                              command=lambda: unlock_harvest(user_input, password_input))
+# enter_button.place(relx=0.5, rely=0.5, anchor="center")
+#
+# output_unlock = ctk.CTkTextbox(master=overlay_container,
+#                                width=300,
+#                                height=110,
+#                                font=("Arial", 12),
+#                                text_color="white",
+#                                border_color="gray",
+#                                wrap="word")
+# output_unlock.place(relx=0.51, rely=0.7, anchor="center")
+
+# ------------------------------------------------------------------------------------------------- End of Password
 
 # Header Label
 label = ctk.CTkLabel(window,
-                     text='HarvestR / DNS OSINT Tool (versions 1.01)',
+                     text='Image Recognition / DNS / Social Media OSINT Tool (versions 1.01)',
                      font=("Arial", 14, "bold"),
                      text_color='black',
                      fg_color='orange')
@@ -237,7 +309,7 @@ label.pack(fill="x")
 
 s = ttk.Style()
 s.theme_use('default')
-s.configure('TNotebook.Tab', background="#FFA500", font=('Arial', 10, 'bold'))
+s.configure('TNotebook.Tab', background="gray", font=('Arial', 10, 'bold'))
 s.configure('TNotebook', background='#242424', foreground='#242424', bordercolor='#242424')
 s.map("TNotebook", background=[("selected", "#FFA500")])
 
@@ -246,16 +318,24 @@ my_tab = ttk.Notebook(window, width=1045, height=860)
 my_tab.pack()
 
 # Define the tab_1 and tab_2 frames
+tab_0 = Frame(my_tab, bg="orange")
 tab_1 = Frame(my_tab, bg="#242424")
 tab_2 = Frame(my_tab, bg="#242424")
-tab_3 = Frame(my_tab, bg="#242424")
+tab_3 = Frame(my_tab, bg="gray")
 
 tab_1.pack(fill="both", expand=True)
 
 # Add the tab frames to the notebook
+my_tab.add(tab_0, text="Main")
 my_tab.add(tab_1, text="Image-Recon")
 my_tab.add(tab_2, text="DNS")
 my_tab.add(tab_3, text="Social Scrapper")
+
+bg_main = PhotoImage(file="Images/MainTab.png")
+canvas = Canvas(tab_0, width=840, height=740, background='black', highlightthickness=0)
+
+canvas.create_image(5, 0, image=bg_main, anchor=NW)
+canvas.pack(fill="both", expand=True)
 
 # Label 1
 label1 = ctk.CTkLabel(tab_1,
@@ -407,7 +487,7 @@ button4 = ctk.CTkButton(master=container2,
                         hover_color="orange",
                         width=240,
                         height=35,
-                        command=run_analysis)
+                        command=lambda: run_analysis())
 button4.place(x=520, y=190)
 
 # Button 5: Cancel
@@ -622,54 +702,55 @@ def selectElement(value):
     choice = value
 
     match choice:
-        case 'IP':
-            choice = 1  # IP
+        case '0':
+            choice = 0  # IP
+            printElements(choice)
+        case '1':
+            choice = 1  # Host Name
             printElements(choice)
         case '2':
-            choice = 2  # Host Name
+            choice = 2  # IP Range
             printElements(choice)
         case '3':
-            choice = 3  # IP Range
+            choice = 3  # ISP
             printElements(choice)
         case '4':
-            choice = 4  # ISP
+            choice = 4  # Organization
             printElements(choice)
         case '5':
-            choice = 5  # Organization
+            choice = 5  # Country
             printElements(choice)
         case '6':
-            choice = 6  # Country
+            choice = 6  # Region
             printElements(choice)
         case '7':
-            choice = 7  # Region
+            choice = 7  # City
             printElements(choice)
         case '8':
-            choice = 8  # City
+            choice = 8  # Time Zone
             printElements(choice)
         case '9':
-            choice = 9  # Time Zone
+            choice = 9  # Local Time
             printElements(choice)
         case '10':
-            choice = 10  # Local Time
-            printElements(choice)
-        case '11':
-            choice = 11  # Postal Code
+            choice = 10  # Postal Code
             printElements(choice)
 
     choice = my_combo.get()
 
     # Define mapping of choices to their corresponding indexes
     choice_mapping = {
-        "IP": 1,
-        "Host Name": 2,
-        "ISP": 4,
-        "Organization": 5,
-        "Country": 6,
-        "Region": 7,
-        "City": 8,
-        "Time Zone": 9,
-        "Local Time": 10,
-        "Postal code": 11
+        "IP": 0,
+        "Host Name": 1,
+        "IP Range": 2,
+        "ISP": 3,
+        "Organization": 4,
+        "Country": 5,
+        "Region": 6,
+        "City": 7,
+        "Time Zone": 8,
+        "Local Time": 9,
+        "Postal code": 10
     }
 
     # Get the index corresponding to the selected choice
@@ -684,15 +765,17 @@ def selectElement(value):
 
 # Create text file and pass table info
 def writeFile():
-    tables = open("newFile.txt", 'w')
+    tables = open("DNS Results.txt", 'w')
     tables.write(passList())
     tables.close()
+    visual_box2.insert("end", "\nResults saved successfully.")
 
 
 # The link: had to put this here, not a fan
 def domainNameLink():
 
     visual_box1.delete(1.0, "end")
+    visual_box2.delete(1.0, "end")
 
     global dbIP_tableContents, ipgeolocation_tableContents, ip2location_tableContents, geolite2_tableContents
     global ipinfoio_tableContents
@@ -750,7 +833,7 @@ def domainNameLink():
 
 
 # Define image
-bg = PhotoImage(file="DNSBackgroundLarge.png")
+bg = PhotoImage(file="Images/DNSBackgroundLarge.png")
 
 # Transparent color
 window.wm_attributes('-transparentcolor', '#382276')
@@ -763,7 +846,7 @@ canvas.create_text(105, 350, text='Table View ', fill="white", font=('Arial', 12
 canvas.create_text(720, 350, text='Element View: ', fill="white", font=('Arial', 12, 'bold'))
 canvas.pack(fill="both", expand=True)
 
-# Tab Container 2
+# Tab 2 Container
 tab_2_container = ctk.CTkFrame(master=tab_2,
                                width=770,
                                height=180,
@@ -772,8 +855,8 @@ tab_2_container = ctk.CTkFrame(master=tab_2,
                                corner_radius=20)
 tab_2_container.place(relx=0.04, rely=0.1, anchor="nw")
 
-# Used for transparency
-# pywinstyles.set_opacity(tab_2_container, color="#000001")
+# Used for transparency of rounded edges
+pywinstyles.set_opacity(tab_2_container, color="#000001")
 
 # Label for Domain
 tab2_label = ctk.CTkLabel(tab_2_container,
@@ -827,7 +910,6 @@ view = ["IP",
         "Local Time",
         "Postal code"]
 
-
 # Dropdown for view 2
 my_combo = ctk.CTkComboBox(tab_2,
                            values=view,
@@ -860,5 +942,243 @@ visual_box2 = ctk.CTkTextbox(master=tab_2,
                              fg_color="white",
                              wrap="word")
 visual_box2.place(relx=0.52, rely=0.45, anchor="nw")
+
+# ----------------------------------------------------------------------------------------------------- End of First Tab
+# ------------------------------------------------------------------------------------ Beginning of Social: Credit Jason
+
+
+def instagram(name):
+
+    url = 'https://www.instagram.com/'
+    driver = webdriver.Chrome()
+    driver.get(url)
+    time.sleep(5)
+    click = pyautogui.locateOnScreen("Images/Userlogin.png", confidence=0.7)
+    pyautogui.moveTo(click, duration=0.3)
+    pyautogui.leftClick()
+
+    time.sleep(1)
+    pyautogui.typewrite("kjman11555")
+    time.sleep(2)
+    pyautogui.press('tab')
+    pyautogui.typewrite("Ilovegod1234")
+    time.sleep(2)
+    pyautogui.press("enter")
+    time.sleep(4)
+    urls = name
+    driver.get(urls)
+    time.sleep(3)
+
+    try:
+        post_element = driver.find_element('css selector', 'li:nth-child(1) span.x1vvkbs')
+        follower_element = driver.find_element('css selector', 'li:nth-child(2) span.x1vvkbs')
+        following_element = driver.find_element('css selector', 'li:nth-child(3) span.x1vvkbs')
+        bio = driver.find_element('class name', 'x7a106z')
+        mimi_story = driver.find_element('class name', '_aap0')
+
+        # Extract the text from the elements
+        bio_content = bio.text
+        post_count = post_element.text
+        follower_count = follower_element.text
+        following_count = following_element.text
+        story_content = mimi_story.text
+
+        # Print the counts
+        visual_box3.insert("end", "\nInstagram Results: \n")
+        visual_box3.insert("end", "\nPost count: \n" + post_count)
+        visual_box3.insert("end", "\nFollower count: \n" + follower_count)
+        visual_box3.insert("end", "\nFollowing count: \n" + following_count)
+        visual_box3.insert("end", "\nBio: \n" + bio_content)
+        visual_box3.insert("end", "Stories: " + story_content)
+    except TimeoutException as e:
+        visual_box3.insert("end", "Some information could not be found: ", e)
+
+
+def linked(link):
+
+    driver = webdriver.Chrome()
+
+    url = link
+    driver.get(url)
+    time.sleep(5)
+    close_button = pyautogui.locateOnScreen("Images/CloseButton.png", confidence=0.7)
+    pyautogui.moveTo(close_button, duration=0.3)
+    pyautogui.leftClick()
+    time.sleep(5)
+    headline_element = driver.find_element("css selector", "h2.top-card-layout__headline")
+    headline = headline_element.text.strip()
+
+    # Extracting experience details
+    experience_section = driver.find_element("css selector", "section[data-section='experience']")
+    experience_text = experience_section.text.strip()
+
+    # Extracting education details
+    education_section = driver.find_element("css selector", "section[data-section='educationsDetails']")
+    education_text = education_section.text.strip()
+
+    # Extracting person's name
+    name_element = driver.find_element("css selector", "h1.top-card-layout__title")
+    name = name_element.text.strip()
+
+    # Print the extracted information
+    visual_box3.insert("end", "LinkedIn Results:\n")
+    visual_box3.insert("end", "\nName: " + name)
+    visual_box3.insert("end", "\nHeadline: " + headline)
+    visual_box3.insert("end", "\nExperience Details: " + experience_text)
+    visual_box3.insert("end", "\nEducation Details: " + education_text)
+    driver.quit()
+
+
+def social_harvest():
+
+    username = text_field5.get()
+    linkedin_link = text_field6.get()
+
+    if username.strip() == '' and linkedin_link.strip() == '':
+        visual_box3.insert("end", "No input provided. Please enter username(s).")
+        return
+
+    if username.strip() != '':
+        ig_name = "https://www.instagram.com/" + username + "/"
+        instagram(ig_name)
+
+    if linkedin_link.strip() != '':
+
+        if linkedin_link.startswith('https://'):
+            linked(linkedin_link)
+            return
+        else:
+            link_name = "https://" + linkedin_link
+            linked(link_name)
+            return
+
+
+def save_instagram():
+
+    instagram_results = visual_box3.get("end-1c linestart", "end").strip()
+
+    if not instagram_results:
+        visual_box3.insert("end", "\nPlease search an account before saving.")
+        return
+
+    if instagram_results == "Please search an account before saving.":
+        visual_box3.insert("end", "\nPlease search an account before saving.")
+        return
+
+    instagram_file = visual_box3.get("1.0", "end-1c").strip()
+
+    try:
+        with open("Instagram_Results.txt", "w") as file:
+            file.write(instagram_file)
+        visual_box3.insert("end", "\nInstagram results saved to Instagram_results.txt")
+    except Exception as e:
+        visual_box3.insert("end", f"\nError occurred while saving: {e}")
+
+
+def clear_instagram():
+    visual_box3.delete("1.0", "end")
+
+
+bg2 = PhotoImage(file="Images/SocialBackground.png")
+
+canvas2 = Canvas(tab_3, width=840, height=740, background='black', highlightthickness=0)
+
+canvas2.create_image(5, 0, image=bg2, anchor=NW)
+canvas2.create_text(170, 50, text='Social Media Scrapper', fill="black", font=('Arial', 14, 'bold'))
+canvas2.pack(fill="both", expand=True)
+
+# Tab 3 Container
+tab_3_container = ctk.CTkFrame(master=tab_3,
+                               width=770,
+                               height=180,
+                               fg_color="white",
+                               bg_color="#000001",
+                               corner_radius=20)
+tab_3_container.place(relx=0.04, rely=0.1, anchor="nw")
+
+pywinstyles.set_opacity(tab_3_container, color="#000001")
+
+# Label for Instagram
+tab3_label = ctk.CTkLabel(tab_3_container,
+                          text='Instagram Username: ',
+                          font=("Arial", 14, "bold"),
+                          text_color='black',
+                          bg_color="white")
+tab3_label.place(relx=0.1, rely=0.3, anchor="nw")
+
+# Text field 5 (Enter Instagram Username)
+text_field5 = ctk.CTkEntry(master=tab_3_container,
+                           width=300,
+                           font=("Arial", 12),
+                           fg_color="white",
+                           text_color='black',
+                           placeholder_text="Enter Instagram Username")
+text_field5.place(relx=0.31, rely=0.3, anchor="nw")
+
+# Label for LinkedIn
+tab4_label = ctk.CTkLabel(tab_3_container,
+                          text='LinkIn Profile Link: ',
+                          font=("Arial", 14, "bold"),
+                          text_color='black',
+                          bg_color="white")
+tab4_label.place(relx=0.126, rely=0.5, anchor="nw")
+
+# Text field 6 (Enter LinkIn Profile Link)
+text_field6 = ctk.CTkEntry(master=tab_3_container,
+                           width=300,
+                           font=("Arial", 12),
+                           fg_color="white",
+                           text_color='black',
+                           placeholder_text="Enter LinkedIn URL Link")
+text_field6.place(relx=0.31, rely=0.5, anchor="nw")
+
+# Visual display 3
+visual_box3 = ctk.CTkTextbox(master=tab_3,
+                             width=770,
+                             height=360,
+                             font=("Arial", 12),
+                             text_color="black",
+                             bg_color="#000001",
+                             fg_color="white",
+                             wrap="word")
+visual_box3.place(relx=0.04, rely=0.4, anchor="nw")
+
+pywinstyles.set_opacity(visual_box3, color="#000001")
+
+# Button 7: Run Social Search
+button7 = ctk.CTkButton(master=tab_3_container,
+                        text="Search",
+                        font=("Arial", 12, "bold"),
+                        fg_color="dark gray",
+                        bg_color='white',
+                        text_color="black",
+                        hover_color="gray",
+                        width=110,
+                        command=lambda: social_harvest())
+button7.place(relx=0.27, rely=0.75, anchor="nw")
+
+# Button 8: Save Results
+button8 = ctk.CTkButton(master=tab_3_container,
+                        text="Save",
+                        font=("Arial", 12, "bold"),
+                        fg_color="dark gray",
+                        bg_color='white',
+                        text_color="black",
+                        hover_color="gray",
+                        width=110,
+                        command=lambda: save_instagram())
+button8.place(relx=0.43, rely=0.75, anchor="nw")
+
+# Button 9: Clear Results
+button9 = ctk.CTkButton(master=tab_3_container,
+                        text="Clear",
+                        font=("Arial", 12, "bold"),
+                        fg_color="dark gray",
+                        bg_color='white',
+                        text_color="black",
+                        hover_color="gray",
+                        width=110,
+                        command=lambda: clear_instagram())
+button9.place(relx=0.59, rely=0.75, anchor="nw")
 
 window.mainloop()
